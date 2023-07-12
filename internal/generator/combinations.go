@@ -83,34 +83,24 @@ func collectRecords(resultCh chan []string, records [][]string) [][]string {
 	return records
 }
 func generateCombinations(flags map[string]string, paramKeys []string, lang, country string, countryFormat bool, resultCh chan<- []string, parameters map[string][]string) {
-	combinationGenerator(0, "", flags, paramKeys, func(comb string) {
-		paramValues := strings.Split(comb, "_")
-		for _, key := range paramKeys {
-			values := parameters[key]
-			if len(values) > 0 {
-				for _, value := range values {
-					email := generateEmail(lang, country, append(paramValues, value))
-					record := []string{email, lang}
-					if countryFormat {
-						record[1] = country
-					}
-					record = append(record, value)
-					resultCh <- record
-				}
-			} else {
-				email := generateEmail(lang, country, paramValues)
-				record := []string{email, lang}
-				if countryFormat {
-					record[1] = country
-				}
-				record = append(record, "")
-				resultCh <- record
-			}
+	seenRecords := make(map[string]struct{})
+	combinationGenerator(0, []string{}, flags, paramKeys, func(comb []string) {
+		email := generateEmail(lang, country, comb)
+		record := []string{email, lang}
+		if countryFormat {
+			record[1] = country
+		}
+		record = append(record, comb...)
+
+		recordStr := strings.Join(record, "|")
+		if _, seen := seenRecords[recordStr]; !seen {
+			seenRecords[recordStr] = struct{}{}
+			resultCh <- record
 		}
 	}, parameters)
 }
 
-func combinationGenerator(index int, current string, flags map[string]string, paramKeys []string, callback func(string), parameters map[string][]string) {
+func combinationGenerator(index int, current []string, flags map[string]string, paramKeys []string, callback func([]string), parameters map[string][]string) {
 	if index == len(paramKeys) {
 		callback(current)
 		return
@@ -119,13 +109,8 @@ func combinationGenerator(index int, current string, flags map[string]string, pa
 	key := paramKeys[index]
 	value := parameters[key]
 	if len(value) > 0 {
-		values := strings.Split(value[0], ",")
-		for _, v := range values {
-			newCurrent := current
-			if newCurrent != "" {
-				newCurrent += "_"
-			}
-			newCurrent += v
+		for _, v := range value {
+			newCurrent := append(current, v)
 			combinationGenerator(index+1, newCurrent, flags, paramKeys, callback, parameters)
 		}
 	} else {
