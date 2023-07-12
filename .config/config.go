@@ -6,6 +6,6 @@ type ConfigType struct {
 }
 
 var Config = ConfigType{
-	URL:   "{{PLACEHOLDER1}}"
-	Token: "{{PLACEHOLDER2}}"
+	URL:   "{{PLACEHOLDER1}}",
+	Token: "{{PLACEHOLDER2}}",
 }
