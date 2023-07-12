@@ -5,7 +5,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/bxxf/target-gen/internal/utils"
+	"github.com/bxxf/tgen/internal/utils"
 )
 
 func Generate(languages []string, flags map[string]string, parameters map[string][]string) ([][]string, error) {

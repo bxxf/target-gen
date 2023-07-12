@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bxxf/target-gen/internal/csv"
+	"github.com/bxxf/tgen/internal/csv"
 )
 
 // ParseArgs parses command line arguments and returns a map of parameters.

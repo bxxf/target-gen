@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/bxxf/target-gen/cmd"
+	"github.com/bxxf/tgen/cmd"
 )
 
 func main() {

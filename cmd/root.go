@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/bxxf/target-gen/internal/csv"
-	"github.com/bxxf/target-gen/internal/generator"
-	"github.com/bxxf/target-gen/internal/utils"
+	"github.com/bxxf/tgen/internal/csv"
+	"github.com/bxxf/tgen/internal/generator"
+	"github.com/bxxf/tgen/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ var (
 	format   string
 	rootCmd  = &cobra.Command{
 		Use:     "tgen loc=[languages] [attributes] [flags]",
-		Aliases: []string{"target-gen", "tg"},
+		Aliases: []string{"tgen", "tg"},
 		Short:   "Generate target records",
 		Long: `Examples:
   tgen loc=en,es,de --format=countryOnly

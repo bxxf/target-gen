@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bxxf/target-gen/internal/utils"
+	"github.com/bxxf/tgen/internal/utils"
 )
 
 func parseCountries(languages []string, flags map[string]string, enAll bool) ([]string, bool, error) {

@@ -1,4 +1,4 @@
-module github.com/bxxf/target-gen
+module github.com/bxxf/tgen
 
 go 1.20
 

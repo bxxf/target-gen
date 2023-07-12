@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/bxxf/target-gen/internal/csv"
+	"github.com/bxxf/tgen/internal/csv"
 )
 
 func GetLanguagesFromLocFile(locFilePath string) ([]string, error) {
