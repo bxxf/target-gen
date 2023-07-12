@@ -1,119 +1,115 @@
 package generator
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/bxxf/tgen/internal/utils"
 )
 
-func parseCountries(languages []string, flags map[string]string, enAll bool) ([]string, bool, error) {
-	countryFormat, brandCountries, err := handleFormat(languages, flags)
+func getBrandCountries(langs []string, flags map[string]string, includeEN bool) ([]string, bool, error) {
+	isCountryFormat, countries, err := determineFormat(langs, flags)
 	if err != nil {
-		return nil, countryFormat, err
+		return nil, isCountryFormat, err
 	}
-	countries := brandCountries
 
-	if enAll {
+	if includeEN {
 		countries = append(countries, EN_COUNTRIES...)
 	}
 	countries = utils.RemoveDuplicates(countries)
 	for i := range countries {
 		countries[i] = strings.ToUpper(countries[i])
 	}
-	return countries, countryFormat, nil
+	return countries, isCountryFormat, nil
 }
 
-func handleFormat(languages []string, flags map[string]string) (bool, []string, error) {
-	countryFormat := false
-	format := flags["format"]
-	if format != "" {
-		if strings.ToLower(format) == "countryiso" {
-			countryFormat = true
+func determineFormat(langs []string, flags map[string]string) (bool, []string, error) {
+	isCountryFormat := false
+	formatFlag := flags["format"]
+	if formatFlag != "" {
+		if strings.ToLower(formatFlag) == "countryiso" {
+			isCountryFormat = true
 		}
 		delete(flags, "format")
 	}
-	var err error
-	var brandCountries []string
-	if len(languages) > 0 {
-		if strings.ToLower(languages[0]) == Avg {
-			countryFormat = true
+	var countries []string
+	if len(langs) > 0 {
+		if strings.ToLower(langs[0]) == Avg {
+			isCountryFormat = true
 		}
-		brandCountriesK, ok := BrandToCountries[languages[0]]
+		countriesMapped, ok := BrandToCountries[langs[0]]
 		if !ok {
-			brandCountriesK = languages
+			countriesMapped = langs
 		}
-
-		brandCountries = brandCountriesK
-
+		countries = countriesMapped
 	}
-	return countryFormat, brandCountries, err
+	return isCountryFormat, countries, nil
 }
 
-func parseHeader(parameters map[string][]string, countryFormat bool) ([]string, []string) {
-	paramKeys := utils.GetParamKeys(parameters)
+func generateHeader(params map[string][]string, isCountryFormat bool) ([]string, []string) {
+	paramKeys := utils.GetParamKeys(params)
 	header := []string{"email", "locale"}
-	if countryFormat {
+	if isCountryFormat {
 		header[1] = "country_iso"
 	}
-	var dynamicParamKeys []string
+	var relevantParamKeys []string
 	for _, key := range paramKeys {
-		value := parameters[key]
+		value := params[key]
 		// Exclude parameters with empty values
 		if len(value) > 0 {
 			header = append(header, key)
-			dynamicParamKeys = append(dynamicParamKeys, key)
+			relevantParamKeys = append(relevantParamKeys, key)
 		}
 	}
-	return dynamicParamKeys, header
+	return relevantParamKeys, header
 }
 
-func initializeRecords(header []string) [][]string {
+func createRecords(header []string) [][]string {
 	var records [][]string
 	records = append(records, header)
 	return records
 }
 
-func collectRecords(resultCh chan []string, records [][]string) [][]string {
-	for record := range resultCh {
+func assembleRecords(resultsCh chan []string, records [][]string) [][]string {
+	for record := range resultsCh {
 		if record != nil {
 			records = append(records, record)
 		}
 	}
 	return records
 }
-func generateCombinations(flags map[string]string, paramKeys []string, lang, country string, countryFormat bool, resultCh chan<- []string, parameters map[string][]string) {
-	combinationGenerator(0, []string{}, flags, paramKeys, func(comb []string) {
-		email := generateEmail(lang, country, comb)
+
+func createCombinations(flags map[string]string, paramKeys []string, lang, country string, isCountryFormat bool, resultsCh chan<- []string, params map[string][]string) {
+	iterateCombinations(0, []string{}, flags, paramKeys, func(comb []string) {
+		email := constructEmail(lang, country, comb)
 		record := []string{email, lang}
-		if countryFormat {
+		if isCountryFormat {
 			record[1] = country
 		}
 		record = append(record, comb...)
 
-		resultCh <- record
-	}, parameters)
+		resultsCh <- record
+	}, params)
 }
 
-func combinationGenerator(index int, current []string, flags map[string]string, paramKeys []string, callback func([]string), parameters map[string][]string) {
-	if index == len(paramKeys) {
+func iterateCombinations(idx int, current []string, flags map[string]string, paramKeys []string, callback func([]string), params map[string][]string) {
+	if idx == len(paramKeys) {
 		callback(current)
 		return
 	}
 
-	key := paramKeys[index]
-	value := parameters[key]
+	key := paramKeys[idx]
+	value := params[key]
 	if len(value) > 0 {
 		for _, v := range value {
 			newCurrent := append(current, v)
-			combinationGenerator(index+1, newCurrent, flags, paramKeys, callback, parameters)
+			iterateCombinations(idx+1, newCurrent, flags, paramKeys, callback, params)
 		}
 	} else {
-		combinationGenerator(index+1, current, flags, paramKeys, callback, parameters)
+		iterateCombinations(idx+1, current, flags, paramKeys, callback, params)
 	}
 }
 
-func generateEmail(lang, country string, paramValues []string) string {
+func constructEmail(lang, country string, paramValues []string) string {
 	normalizedLang := strings.ReplaceAll(lang, "-", "_")
 	params := strings.Join(paramValues, "_")
 	delimiter := ""
@@ -122,5 +118,12 @@ func generateEmail(lang, country string, paramValues []string) string {
 	}
 	removeWhitespace := strings.NewReplacer(" ", "_", "\n", "__", "\t", "__", "\r", "")
 	params = removeWhitespace.Replace(params)
-	return fmt.Sprintf("ttgen_%s%s%s@example.com", strings.ToLower(normalizedLang), delimiter, params)
+
+	var b strings.Builder
+	b.WriteString("ttgen_")
+	b.WriteString(strings.ToLower(normalizedLang))
+	b.WriteString(delimiter)
+	b.WriteString(params)
+	b.WriteString("@example.com")
+	return b.String()
 }

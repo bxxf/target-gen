@@ -11,13 +11,13 @@ import (
 func Generate(languages []string, flags map[string]string, parameters map[string][]string) ([][]string, error) {
 	langCountryMapping := utils.GetLangCountryMapping()
 	enAll := flags["en-all"] == "true"
-	countries, isAvg, err := parseCountries(languages, flags, enAll)
+	countries, isAvg, err := getBrandCountries(languages, flags, enAll)
 	if err != nil {
 		return nil, err
 	}
 
-	params, header := parseHeader(parameters, isAvg)
-	records := initializeRecords(header)
+	params, header := generateHeader(parameters, isAvg)
+	records := createRecords(header)
 
 	var wg sync.WaitGroup
 	resultCh := make(chan []string)
@@ -33,7 +33,7 @@ func Generate(languages []string, flags map[string]string, parameters map[string
 				resultCh <- nil
 				return
 			}
-			generateCombinations(flags, params, lang, country, isAvg, resultCh, parameters)
+			createCombinations(flags, params, lang, country, isAvg, resultCh, parameters)
 		}(country)
 	}
 	go func() {
@@ -45,8 +45,9 @@ func Generate(languages []string, flags map[string]string, parameters map[string
 			log.Println(err)
 		}
 	}()
-	records = collectRecords(resultCh, records)
+	records = assembleRecords(resultCh, records)
 	records = removeDuplicateRecords(records)
+
 	log.Printf("Successfully generated %v records with %v languages.", len(records)-1, len(countries))
 
 	return records, nil

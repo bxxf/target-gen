@@ -116,16 +116,18 @@ func CheckError(msg string, err error) {
 }
 
 func RemoveDuplicates(s []string) []string {
-	m := make(map[string]bool)
-	var unique []string
+	unique := make([]string, 0, len(s))
+	seen := make(map[string]struct{})
+
 	for _, item := range s {
-		if _, ok := m[item]; !ok {
-			m[item] = true
+		if _, ok := seen[item]; !ok {
 			unique = append(unique, item)
+			seen[item] = struct{}{}
 		}
 	}
 	return unique
 }
+
 func GetLanguagesFromLocFile(locFilePath string) ([]string, error) {
 	fileData, err := csv.ReadCSVFile(locFilePath)
 	if err != nil {
