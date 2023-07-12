@@ -15,15 +15,20 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var (
-	enAll      bool
-	locFile    string
-	output     string
-	params     map[string][]string
-	format     string
-	configFile string
-	languages  []string
+type Config struct {
+	EnAll      bool
+	LocFile    string
+	Output     string
+	Params     map[string][]string
+	Format     string
+	ConfigFile string
+	Languages  []string
+}
 
+var (
+	cfg = &Config{
+		Params: make(map[string][]string),
+	}
 	rootCmd = &cobra.Command{
 		Use:   "tgen loc=[languages] [attributes] [flags]",
 		Short: "Generate target records",
@@ -38,11 +43,11 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().BoolVar(&enAll, "en-all", false, "Generate for all English locales (US, CA, AU, GB)")
-	rootCmd.Flags().StringVar(&locFile, "loc-file", "", "Path to CSV file containing translated data to import languages")
-	rootCmd.Flags().StringVarP(&output, "output", "o", "", "Output file or folder path (default: tgen-{timestamp}.csv)")
-	rootCmd.Flags().StringVar(&format, "format", "", "Format to generate (countryiso, default)")
-	rootCmd.Flags().StringVar(&configFile, "config", "", "Path to configuration file")
+	rootCmd.PersistentFlags().BoolVar(&cfg.EnAll, "en-all", false, "Generate for all English locales (US, CA, AU, GB)")
+	rootCmd.Flags().StringVar(&cfg.LocFile, "loc-file", "", "Path to CSV file containing translated data to import languages")
+	rootCmd.Flags().StringVarP(&cfg.Output, "output", "o", "", "Output file or folder path (default: tgen-{timestamp}.csv)")
+	rootCmd.Flags().StringVar(&cfg.Format, "format", "", "Format to generate (countryiso, default)")
+	rootCmd.Flags().StringVar(&cfg.ConfigFile, "config", "", "Path to configuration file")
 
 	cobra.OnInitialize(initAutoComplete)
 	rootCmd.PersistentFlags().SetAnnotation("loc-file", cobra.BashCompFilenameExt, []string{".csv", ".txt"})
@@ -77,76 +82,67 @@ func Execute() {
 }
 
 func generateRecords(cmd *cobra.Command, args []string) error {
-	if len(configFile) > 0 {
-		err := initConfig(configFile)
+	if len(cfg.ConfigFile) > 0 {
+		err := initConfig(cfg.ConfigFile)
 		if err != nil {
-			return err
+			return logError(err)
 		}
 	} else {
 		parameters := utils.ParseParams(args)
-		languages = parameters["loc"]
+		cfg.Languages = parameters["loc"]
 
-		if languages == nil && locFile != "" {
+		if cfg.Languages == nil && cfg.LocFile != "" {
 			var err error
-			languages, err = utils.GetLanguagesFromLocFile(locFile)
+			cfg.Languages, err = utils.GetLanguagesFromLocFile(cfg.LocFile)
 			if err != nil {
-				return fmt.Errorf("error reading loc file: %w", err)
+				return logError(fmt.Errorf("error reading loc file: %w", err))
 			}
 
-			if len(languages) == 0 {
-				return fmt.Errorf("no languages found in loc file")
+			if len(cfg.Languages) == 0 {
+				return logError(fmt.Errorf("no languages found in loc file"))
 			}
 		}
 
-		if len(languages) == 0 {
-			return fmt.Errorf("missing list of locales in required argument 'loc'")
+		if len(cfg.Languages) == 0 {
+			return logError(fmt.Errorf("missing list of locales in required argument 'loc'"))
 		}
 
 		delete(parameters, "loc")
 
-		enAllFlag, _ := cmd.Flags().GetBool("en-all")
-		locFileFlag, _ := cmd.Flags().GetString("loc-file")
-		outputFlag, _ := cmd.Flags().GetString("output")
-		formatFlag, _ := cmd.Flags().GetString("format")
-
-		params = parameters
-		enAll = enAllFlag
-		locFile = locFileFlag
-		output = outputFlag
-		format = formatFlag
+		cfg.Params = parameters
 	}
 
 	flags := map[string]string{
-		"en-all":   fmt.Sprintf("%t", enAll),
-		"loc-file": locFile,
-		"output":   output,
-		"format":   format,
+		"en-all":   fmt.Sprintf("%t", cfg.EnAll),
+		"loc-file": cfg.LocFile,
+		"output":   cfg.Output,
+		"format":   cfg.Format,
 	}
 
-	if locFile != "" {
+	if cfg.LocFile != "" {
 		var err error
-		languages, err = utils.GetLanguagesFromLocFile(locFile)
+		cfg.Languages, err = utils.GetLanguagesFromLocFile(cfg.LocFile)
 		if err != nil {
 			log.Printf("error reading loc file: %v", err)
-			return fmt.Errorf("error reading loc file: %w", err)
+			return logError(fmt.Errorf("error reading loc file: %w", err))
 		}
 	}
 
-	if len(languages) < 1 {
-		log.Printf("no languages found in (loc_file=%s) - 'languages' or 'loc_file' parameter", locFile)
-		return fmt.Errorf("no languages found in 'languages' parameter or 'loc_file'")
+	if len(cfg.Languages) < 1 {
+		log.Printf("no languages found in (loc_file=%s) - 'languages' or 'loc_file' parameter", cfg.LocFile)
+		return logError(fmt.Errorf("no languages found in 'languages' parameter or 'loc_file'"))
 	}
 
-	records, err := generator.Generate(languages, flags, params)
+	records, err := generator.Generate(cfg.Languages, flags, cfg.Params)
 	if err != nil {
 		log.Printf("error generating records: %v", err)
-		return fmt.Errorf("error generating records: %w", err)
+		return logError(fmt.Errorf("error generating records: %w", err))
 	}
 
-	filename := utils.GenerateFileName(output)
+	filename := utils.GenerateFileName(cfg.Output)
 	err = csv.WriteToCsv(records, filename)
 	if err != nil {
-		return fmt.Errorf("error writing to CSV: %w", err)
+		return logError(fmt.Errorf("error writing to CSV: %w", err))
 	}
 
 	return nil
@@ -176,24 +172,30 @@ func initConfig(configFile string) error {
 		return err
 	}
 
-	locFile = config.LocFile
-	output = config.Output
-	format = config.Format
-	enAll = config.EnAll
+	cfg.LocFile = config.LocFile
+	cfg.Output = config.Output
+	cfg.Format = config.Format
+	cfg.EnAll = config.EnAll
 
-	var paramsMap = make(map[string][]string)
 	for _, param := range config.Params {
 		parts := strings.Split(param, "=")
 		if len(parts) != 2 {
 			return fmt.Errorf("invalid parameter: %s", param)
 		}
 
-		paramsMap[parts[0]] = strings.Split(parts[1], ",")
+		cfg.Params[parts[0]] = strings.Split(parts[1], ",")
 	}
 
-	params = paramsMap
+	cfg.Languages = strings.Split(strings.Replace(config.Languages, " ", "", -1), ",")
 
-	languages = strings.Split(strings.Replace(config.Languages, " ", "", -1), ",")
+	if len(cfg.Languages) == 0 && cfg.LocFile == "" {
+		return fmt.Errorf("missing required parameters in config file (loc_file or languages)")
+	}
 
 	return nil
+}
+
+func logError(err error) error {
+	log.Println(err)
+	return err
 }
