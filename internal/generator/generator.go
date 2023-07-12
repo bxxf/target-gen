@@ -46,7 +46,7 @@ func Generate(languages []string, flags map[string]string, parameters map[string
 		}
 	}()
 	records = collectRecords(resultCh, records)
-	log.Printf("Successfully generated %v records with %v languages.", len(records)-1, len(languages))
+	log.Printf("Successfully generated %v records with %v languages.", len(records)-1, len(countries))
 
 	return records, nil
 }
