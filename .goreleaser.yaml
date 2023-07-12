@@ -28,9 +28,9 @@ brews:
   - name: tgen
     tap:
       owner: bxxf
-      name: homebrew-bxxf
+      name: homebrew-tap
     folder: Formula
-    homepage: https://github.com/bxxf/target-gen
+    homepage: https://github.com/bxxf/tgen
     description: Simple tool for creating CSV target files
     install: |
       bin.install "tgen"
