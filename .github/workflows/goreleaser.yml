@@ -1,4 +1,4 @@
-name: goreleaser
+name: Release
 
 on:
   push:
@@ -22,6 +22,18 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.19
+      
+      - 
+        name: Replace placeholders
+        run: |
+          sed -i "s/{{PLACEHOLDER1}}/${{ secrets.PLACEHOLDER1 }}/g" .config/config.go
+          sed -i "s/{{PLACEHOLDER2}}/${{ secrets.PLACEHOLDER2 }}/g" .config/config.go
+
+      - name: Move config.go to config directory
+        run: |
+          mkdir -p config
+          mv .config/config.go config/config.go
+
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
