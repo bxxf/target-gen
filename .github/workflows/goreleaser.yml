@@ -26,8 +26,9 @@ jobs:
       - 
         name: Replace placeholders
         run: |
-          sed -i "s/{{PLACEHOLDER1}}/${{ secrets.PLACEHOLDER1 }}/g" .config/config.go
-          sed -i "s/{{PLACEHOLDER2}}/${{ secrets.PLACEHOLDER2 }}/g" .config/config.go
+          sed -i 's|{{PLACEHOLDER1}}|'"${{ secrets.PLACEHOLDER1 }}"'|g' .config/config.go
+          sed -i 's|{{PLACEHOLDER2}}|'"${{ secrets.PLACEHOLDER2 }}"'|g' .config/config.go
+
 
       - name: Move config.go to config directory
         run: |
