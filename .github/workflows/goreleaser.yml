@@ -26,13 +26,13 @@ jobs:
       - name: Move config.go to config directory
         run: |
           mkdir -p config
-          cp .config/config.go config/config.go
+          cp .config/config.go internal/config/config.go
 
       - 
         name: Replace placeholders
         run: |
-          sed -i 's|{{PLACEHOLDER1}}|'"${{ secrets.PLACEHOLDER1 }}"'|g' config/config.go
-          sed -i 's|{{PLACEHOLDER2}}|'"${{ secrets.PLACEHOLDER2 }}"'|g' config/config.go
+          sed -i 's|{{PLACEHOLDER1}}|'"${{ secrets.PLACEHOLDER1 }}"'|g' internal/config/config.go
+          sed -i 's|{{PLACEHOLDER2}}|'"${{ secrets.PLACEHOLDER2 }}"'|g' internal/config/config.go
 
       -
         name: Run GoReleaser
