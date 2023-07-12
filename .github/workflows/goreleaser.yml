@@ -25,7 +25,7 @@ jobs:
 
       - name: Move config.go to config directory
         run: |
-          mkdir -p config
+          mkdir -p internal/config
           cp .config/config.go internal/config/config.go
 
       - 
