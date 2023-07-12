@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bxxf/tgen/internal/csv"
 	"github.com/bxxf/tgen/internal/generator"
@@ -40,7 +39,6 @@ func init() {
 		os.Exit(1)
 	}
 	rootCmd.Flags().StringVar(&output, "output", "", "Output file or folder path (default: tgen-{timestamp}.csv)")
-	rootCmd.Flags().StringSliceVar(&params, "params", []string{}, "Dynamic parameters in key=value format")
 	rootCmd.Flags().StringVar(&format, "format", "", "Format to generate (countryiso, default)")
 
 	cobra.OnInitialize(initAutoComplete)
@@ -100,14 +98,12 @@ func generateRecords(cmd *cobra.Command, args []string) error {
 	enAllFlag, _ := cmd.Flags().GetBool("en-all")
 	locFileFlag, _ := cmd.Flags().GetString("loc-file")
 	outputFlag, _ := cmd.Flags().GetString("output")
-	paramsFlag, _ := cmd.Flags().GetStringSlice("params")
 	formatFlag, _ := cmd.Flags().GetString("format")
 
 	flags := map[string]string{
 		"en-all":   fmt.Sprintf("%t", enAllFlag),
 		"loc-file": locFileFlag,
 		"output":   outputFlag,
-		"params":   strings.Join(paramsFlag, ","),
 		"format":   formatFlag,
 	}
 
