@@ -26,7 +26,7 @@ jobs:
       - name: Move config.go to config directory
         run: |
           mkdir -p config
-          mv .config/config.go config/config.go
+          cp .config/config.go config/config.go
 
       - 
         name: Replace placeholders
