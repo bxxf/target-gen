@@ -35,6 +35,10 @@ var (
 func init() {
 	rootCmd.PersistentFlags().BoolVar(&enAll, "en-all", false, "Generate for all English locales (US, CA, AU, GB)")
 	rootCmd.Flags().StringVar(&locFile, "loc-file", "", "Path to CSV file containing translated data to import languages")
+	if err := rootCmd.RegisterFlagCompletionFunc("loc-file", autoCompleteLocFile); err != nil {
+		fmt.Fprintln(os.Stderr, "Error:", err)
+		os.Exit(1)
+	}
 	rootCmd.Flags().StringVar(&output, "output", "", "Output file or folder path (default: tgen-{timestamp}.csv)")
 	rootCmd.Flags().StringSliceVar(&params, "params", []string{}, "Dynamic parameters in key=value format")
 	rootCmd.Flags().StringVar(&format, "format", "", "Format to generate (countryiso, default)")
