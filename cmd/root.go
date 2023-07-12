@@ -20,14 +20,13 @@ var (
 	filename string
 	format   string
 	rootCmd  = &cobra.Command{
-		Use:     "tgen loc=[languages] [attributes] [flags]",
-		Aliases: []string{"tgen", "tg"},
-		Short:   "Generate target records",
+		Use:   "tgen loc=[languages] [attributes] [flags]",
+		Short: "Generate target records",
 		Long: `Examples:
   tgen loc=en,es,de --format=countryOnly
   tgen loc=avast --en-all
-  tg loc=avast segment=SKU1,SKU2 activationKey=xxx
-  tg --loc-file=loc.csv
+  tgen loc=avast segment=SKU1,SKU2 activationKey=xxx
+  tgen --loc-file=loc.csv
 `,
 		RunE: generateRecords,
 	}
