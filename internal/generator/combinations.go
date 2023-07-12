@@ -85,20 +85,28 @@ func collectRecords(resultCh chan []string, records [][]string) [][]string {
 func generateCombinations(flags map[string]string, paramKeys []string, lang, country string, countryFormat bool, resultCh chan<- []string, parameters map[string][]string) {
 	combinationGenerator(0, "", flags, paramKeys, func(comb string) {
 		paramValues := strings.Split(comb, "_")
-		email := generateEmail(lang, country, paramValues)
-		record := []string{email, lang}
-		if countryFormat {
-			record[1] = country
-		}
 		for _, key := range paramKeys {
-			value := parameters[key]
-			if len(value) > 0 {
-				record = append(record, value[0])
+			values := parameters[key]
+			if len(values) > 0 {
+				for _, value := range values {
+					email := generateEmail(lang, country, append(paramValues, value))
+					record := []string{email, lang}
+					if countryFormat {
+						record[1] = country
+					}
+					record = append(record, value)
+					resultCh <- record
+				}
 			} else {
+				email := generateEmail(lang, country, paramValues)
+				record := []string{email, lang}
+				if countryFormat {
+					record[1] = country
+				}
 				record = append(record, "")
+				resultCh <- record
 			}
 		}
-		resultCh <- record
 	}, parameters)
 }
 
