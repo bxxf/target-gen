@@ -1,0 +1,9 @@
+loc_file: 6-28-2023-Norton2023_VPN-Setup_Test_LOC_translated
+# languages: avg
+# languages: en, es, de, fr
+params:
+#  - segment=SKU1,SKU2
+#  - activationKey=xxx
+format: country_iso
+#en_all: false
+output: output.csv

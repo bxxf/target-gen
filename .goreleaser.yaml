@@ -1,0 +1,41 @@
+builds:
+  - goos:
+    - darwin
+    - linux
+    - windows
+    goarch:
+    - amd64
+    - arm64
+    env:
+    - CGO_ENABLED=0
+    flags:
+    - -mod=vendor
+
+release:
+  prerelease: auto
+
+universal_binaries:
+  - replace: true
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+brews:
+  - name: tgen
+    tap:
+      owner: bxxf
+      name: homebrew-tap
+    folder: Formula
+    homepage: https://github.com/bxxf/tgen
+    description: Simple tool for creating CSV target files
+    install: |
+      bin.install "tgen"
+    test: |
+      system "#{bin}/tgen"
+
+checksum:
+  name_template: 'checksums.txt'
