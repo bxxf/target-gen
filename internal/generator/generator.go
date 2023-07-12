@@ -46,7 +46,22 @@ func Generate(languages []string, flags map[string]string, parameters map[string
 		}
 	}()
 	records = collectRecords(resultCh, records)
+	records = removeDuplicateRecords(records)
 	log.Printf("Successfully generated %v records with %v languages.", len(records)-1, len(countries))
 
 	return records, nil
+}
+
+func removeDuplicateRecords(records [][]string) [][]string {
+	seen := make(map[string][]string)
+	var unique [][]string
+
+	for _, record := range records {
+		key := fmt.Sprint(record)
+		if _, ok := seen[key]; !ok {
+			seen[key] = record
+			unique = append(unique, record)
+		}
+	}
+	return unique
 }

@@ -83,7 +83,6 @@ func collectRecords(resultCh chan []string, records [][]string) [][]string {
 	return records
 }
 func generateCombinations(flags map[string]string, paramKeys []string, lang, country string, countryFormat bool, resultCh chan<- []string, parameters map[string][]string) {
-	seenRecords := make(map[string]struct{})
 	combinationGenerator(0, []string{}, flags, paramKeys, func(comb []string) {
 		email := generateEmail(lang, country, comb)
 		record := []string{email, lang}
@@ -92,11 +91,7 @@ func generateCombinations(flags map[string]string, paramKeys []string, lang, cou
 		}
 		record = append(record, comb...)
 
-		recordStr := strings.Join(record, "|")
-		if _, seen := seenRecords[recordStr]; !seen {
-			seenRecords[recordStr] = struct{}{}
-			resultCh <- record
-		}
+		resultCh <- record
 	}, parameters)
 }
 
