@@ -1,4 +1,4 @@
-package rediscli
+package data
 
 import (
 	"encoding/json"
@@ -8,20 +8,20 @@ import (
 	"strings"
 )
 
-type UpstashClient struct {
+type DataClient struct {
 	baseURL string
 	token   string
 }
 
-func NewUpstashClient(baseURL string, token string) *UpstashClient {
-	return &UpstashClient{baseURL: baseURL, token: token}
+func NewDataClient(baseURL string, token string) *DataClient {
+	return &DataClient{baseURL: baseURL, token: token}
 }
 
 type BrandCountryResponse struct {
 	Result string `json:"result"`
 }
 
-func (c *UpstashClient) GetCountries(brand string) ([]string, error) {
+func (c *DataClient) GetCountries(brand string) ([]string, error) {
 	url := fmt.Sprintf("%s/get/BRAND:%s", c.baseURL, brand)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
