@@ -1,0 +1,40 @@
+builds:
+  - goos:
+    - darwin
+    - linux
+    goarch:
+    - amd64
+    - arm64
+    env:
+    - CGO_ENABLED=0
+    flags:
+    - -mod=vendor
+
+release:
+  prerelease: auto
+
+universal_binaries:
+  - replace: true
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+brews:
+  - name: targettool
+    tap:
+      owner: bxxf
+      name: homebrew-bxxf
+    folder: Formula
+    homepage: https://github.com/bxxf/target-gen
+    description: Simple tool for creating CSV target files
+    install: |
+      bin.install "tgen"
+    test: |
+      system "#{bin}/tgen"
+
+checksum:
+  name_template: 'checksums.txt'
