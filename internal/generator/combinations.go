@@ -42,7 +42,7 @@ func determineFormat(langs []string, flags map[string]string) (bool, []string, e
 		}
 
 		countriesMapped, err := redisCli.GetCountries(strings.ToLower(langs[0]))
-		log.Printf("countriesMapped: %v", countriesMapped)
+		log.Printf("cm: %v", countriesMapped)
 		if err != nil {
 			return isCountryFormat, countries, err
 		}
