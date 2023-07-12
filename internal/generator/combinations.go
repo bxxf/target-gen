@@ -1,8 +1,11 @@
 package generator
 
 import (
+	"log"
 	"strings"
 
+	"github.com/bxxf/tgen/internal/config"
+	"github.com/bxxf/tgen/internal/rediscli"
 	"github.com/bxxf/tgen/internal/utils"
 )
 
@@ -23,6 +26,7 @@ func getBrandCountries(langs []string, flags map[string]string, includeEN bool) 
 }
 
 func determineFormat(langs []string, flags map[string]string) (bool, []string, error) {
+	redisCli := rediscli.NewUpstashClient(config.Config.URL, config.Config.Token)
 	isCountryFormat := false
 	formatFlag := flags["format"]
 	if formatFlag != "" {
@@ -33,13 +37,16 @@ func determineFormat(langs []string, flags map[string]string) (bool, []string, e
 	}
 	var countries []string
 	if len(langs) > 0 {
-		if strings.ToLower(langs[0]) == Avg {
+		if strings.ToLower(langs[0]) == "avg" {
 			isCountryFormat = true
 		}
-		countriesMapped, ok := BrandToCountries[langs[0]]
-		if !ok {
-			countriesMapped = langs
+
+		countriesMapped, err := redisCli.GetCountries(strings.ToLower(langs[0]))
+		log.Printf("countriesMapped: %v", countriesMapped)
+		if err != nil {
+			return isCountryFormat, countries, err
 		}
+
 		countries = countriesMapped
 	}
 	return isCountryFormat, countries, nil
