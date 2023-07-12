@@ -18,6 +18,7 @@ var (
 	output   string
 	params   []string
 	filename string
+	format   string
 	rootCmd  = &cobra.Command{
 		Use:     "tgen loc=[languages] [attributes] [flags]",
 		Aliases: []string{"target-gen", "tg"},
@@ -37,7 +38,7 @@ func init() {
 	rootCmd.Flags().StringVar(&locFile, "loc-file", "", "Path to CSV file containing translated data to import languages")
 	rootCmd.Flags().StringVar(&output, "output", "", "Output file or folder path (default: tgen-{timestamp}.csv)")
 	rootCmd.Flags().StringSliceVar(&params, "params", []string{}, "Dynamic parameters in key=value format")
-	rootCmd.Flags().String("format", "", "Format to generate (countryiso, default)")
+	rootCmd.Flags().StringVar(&format, "format", "", "Format to generate (countryiso, default)")
 
 	cobra.OnInitialize(initAutoComplete)
 	rootCmd.PersistentFlags().SetAnnotation("loc-file", cobra.BashCompFilenameExt, []string{".csv", ".txt"})
