@@ -24,7 +24,7 @@ changelog:
       - '^test:'
 
 brews:
-  - name: targettool
+  - name: tgen
     tap:
       owner: bxxf
       name: homebrew-bxxf
