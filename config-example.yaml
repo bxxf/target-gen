@@ -1,5 +1,5 @@
-loc_file: 6-28-2023-Norton2023_VPN-Setup_Test_LOC_translated
-# languages: avg
+loc_file: FILENAME.csv
+# languages: brand
 # languages: en, es, de, fr
 params:
 #  - segment=SKU1,SKU2
