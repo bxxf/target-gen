@@ -12,7 +12,7 @@ import (
 
 // ParseArgs parses command line arguments and returns a map of parameters.
 func ParseArgs(args []string) map[string][]string {
-	parameters := make(map[string][]string)
+	parameters := make(map[string][]string, len(args))
 	for _, arg := range args {
 		parts := strings.SplitN(arg, "=", 2)
 		if len(parts) == 2 {
@@ -163,7 +163,7 @@ func GetLanguagesFromLocFile(locFilePath string) ([]string, error) {
 }
 
 func ParseParams(params []string) map[string][]string {
-	parameters := make(map[string][]string)
+	parameters := make(map[string][]string, len(params))
 	for _, param := range params {
 		parts := strings.SplitN(param, "=", 2)
 		if len(parts) == 2 {

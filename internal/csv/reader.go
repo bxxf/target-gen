@@ -1,7 +1,9 @@
 package csv
 
 import (
+	"bufio"
 	"encoding/csv"
+	"io"
 	"os"
 )
 
@@ -12,12 +14,26 @@ func ReadCSVFile(filepath string) ([][]string, error) {
 	}
 	defer file.Close()
 
-	reader := csv.NewReader(file)
-	reader.Comma = '\t'         // Set tab as the delimiter
-	reader.FieldsPerRecord = -1 // Allow varying number of fields per record
-	records, err := reader.ReadAll()
+	reader := csv.NewReader(bufio.NewReader(file))
+	reader.Comma = '\t'
+	reader.FieldsPerRecord = -1
+
+	fileInfo, err := file.Stat()
 	if err != nil {
 		return nil, err
+	}
+	estimatedRecords := int(fileInfo.Size()) / 50
+
+	records := make([][]string, 0, estimatedRecords)
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, err
+		}
+		records = append(records, record)
 	}
 
 	return records, nil
