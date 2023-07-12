@@ -120,5 +120,7 @@ func generateEmail(lang, country string, paramValues []string) string {
 	if params != "" {
 		delimiter = "_"
 	}
+	removeWhitespace := strings.NewReplacer(" ", "_", "\n", "__", "\t", "__", "\r", "")
+	params = removeWhitespace.Replace(params)
 	return fmt.Sprintf("ttgen_%s%s%s@example.com", strings.ToLower(normalizedLang), delimiter, params)
 }
