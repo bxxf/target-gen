@@ -13,7 +13,6 @@ func getBrandCountries(langs []string, flags map[string]string, includeEN bool) 
 	if err != nil {
 		return nil, isCountryFormat, err
 	}
-
 	if includeEN {
 		countries = append(countries, EN_COUNTRIES...)
 	}
@@ -35,18 +34,21 @@ func determineFormat(langs []string, flags map[string]string) (bool, []string, e
 		delete(flags, "format")
 	}
 	var countries []string
-	if len(langs) > 0 {
+	if len(langs) == 1 {
 		if strings.ToLower(langs[0]) == "avg" {
 			isCountryFormat = true
 		}
-
-		countriesMapped, err := redisCli.GetCountries(strings.ToLower(langs[0]))
-		if err != nil {
-			return isCountryFormat, countries, err
-		}
+		countriesMapped, _ := redisCli.GetCountries(strings.ToLower(langs[0]))
 
 		countries = countriesMapped
+	} else {
+		countries = langs
 	}
+
+	if len(countries[0]) == 0 {
+		countries = langs
+	}
+
 	return isCountryFormat, countries, nil
 }
 

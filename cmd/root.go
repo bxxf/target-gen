@@ -33,9 +33,9 @@ var (
 		Use:   "tgen loc=[languages] [attributes] [flags]",
 		Short: "Generate target records",
 		Long: `Examples:
-  tgen loc=avast --en-all
+  tgen loc=BRANDNAME --en-all
   tgen loc=en,es,de --format=countryiso
-  tgen loc=avast segment=SKU1,SKU2 activationKey=xxx
+  tgen loc=BRANDNAME segment=SKU1,SKU2 activationKey=xxx
   tgen --loc-file=loc.csv
 `,
 		RunE: generateRecords,

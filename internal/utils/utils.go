@@ -77,6 +77,19 @@ var CountryToLocale = map[string]string{
 	"CZ": "cs-CZ",
 	"SV": "sv-SE",
 	"DA": "da-DK",
+	"ZH": "zh-CN",
+	"EL": "el-GR",
+	"HE": "he-IL",
+	"JA": "ja-JP",
+	"KO": "ko-KR",
+	"MS": "ms-MY",
+	"RO": "ro-RO",
+	"UK": "uk-UA",
+	"VI": "vi-VN",
+	"AR": "ar-SA",
+	"BG": "bg-BG",
+	"HR": "hr-HR",
+	"CS": "cs-CZ",
 }
 
 func GetLangCountryMapping() map[string]string {

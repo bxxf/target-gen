@@ -1,4 +1,4 @@
-loc_file: FILENAME.csv
+loc_file: LOCFILE.csv
 # languages: brand
 # languages: en, es, de, fr
 params:
