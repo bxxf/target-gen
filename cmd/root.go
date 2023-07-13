@@ -80,36 +80,30 @@ func Execute() {
 		os.Exit(1)
 	}
 }
-
 func generateRecords(cmd *cobra.Command, args []string) error {
+	var err error
+
 	if len(cfg.ConfigFile) > 0 {
-		err := initConfig(cfg.ConfigFile)
+		err = initConfig(cfg.ConfigFile)
 		if err != nil {
 			return logError(err)
 		}
 	} else {
 		parameters := utils.ParseParams(args)
 		cfg.Languages = parameters["loc"]
-
-		if cfg.Languages == nil && cfg.LocFile != "" {
-			var err error
-			cfg.Languages, err = utils.GetLanguagesFromLocFile(cfg.LocFile)
-			if err != nil {
-				return logError(fmt.Errorf("error reading loc file: %w", err))
-			}
-
-			if len(cfg.Languages) == 0 {
-				return logError(fmt.Errorf("no languages found in loc file"))
-			}
-		}
-
-		if len(cfg.Languages) == 0 {
-			return logError(fmt.Errorf("missing list of locales in required argument 'loc'"))
-		}
-
 		delete(parameters, "loc")
-
 		cfg.Params = parameters
+	}
+
+	if cfg.LocFile != "" {
+		cfg.Languages, err = utils.GetLanguagesFromLocFile(cfg.LocFile)
+		if err != nil {
+			return logError(fmt.Errorf("error reading loc file: %w", err))
+		}
+	}
+
+	if len(cfg.Languages) == 0 {
+		return logError(fmt.Errorf("missing list of locales in required argument 'loc'"))
 	}
 
 	flags := map[string]string{
@@ -119,23 +113,8 @@ func generateRecords(cmd *cobra.Command, args []string) error {
 		"format":   cfg.Format,
 	}
 
-	if cfg.LocFile != "" {
-		var err error
-		cfg.Languages, err = utils.GetLanguagesFromLocFile(cfg.LocFile)
-		if err != nil {
-			log.Printf("error reading loc file: %v", err)
-			return logError(fmt.Errorf("error reading loc file: %w", err))
-		}
-	}
-
-	if len(cfg.Languages) < 1 {
-		log.Printf("no languages found in (loc_file=%s) - 'languages' or 'loc_file' parameter", cfg.LocFile)
-		return logError(fmt.Errorf("no languages found in 'languages' parameter or 'loc_file'"))
-	}
-
 	records, err := generator.Generate(cfg.Languages, flags, cfg.Params)
 	if err != nil {
-		log.Printf("error generating records: %v", err)
 		return logError(fmt.Errorf("error generating records: %w", err))
 	}
 
