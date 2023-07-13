@@ -23,9 +23,6 @@ jobs:
         with:
           go-version: 1.19
           
-      -
-        name: Add vendor files
-        run: go mod vendor
 
       - name: Move config.go to config directory
         run: |
@@ -38,6 +35,10 @@ jobs:
           sed -i 's|{{PLACEHOLDER1}}|'"${{ secrets.PLACEHOLDER1 }}"'|g' internal/config/config.go
           sed -i 's|{{PLACEHOLDER2}}|'"${{ secrets.PLACEHOLDER2 }}"'|g' internal/config/config.go
 
+      -
+        name: Add vendor files
+        run: go mod vendor
+        
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
