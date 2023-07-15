@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bxxf/tgen/internal/constants"
 	"github.com/bxxf/tgen/internal/csv"
 )
 
-// ParseArgs parses command line arguments and returns a map of parameters.
 func ParseArgs(args []string) map[string][]string {
 	parameters := make(map[string][]string, len(args))
 	for _, arg := range args {
@@ -32,75 +32,11 @@ func GetParamKeys(parameters map[string][]string) []string {
 	return keys
 }
 
-var CountryToLocale = map[string]string{
-	"US": "en-US",
-	"EN": "en-US",
-	"CA": "en-CA",
-	"AU": "en-AU",
-	"GB": "en-GB",
-	"FI": "fi-FI",
-	"PL": "pl-PL",
-	"BR": "pt-BR",
-	"IT": "it-IT",
-	"NO": "no-NO",
-	"DK": "da-DK",
-	"NL": "nl-NL",
-	"FR": "fr-FR",
-	"DE": "de-DE",
-	"ES": "es-ES",
-	"SE": "sv-SE",
-	"CN": "zh-CN",
-	"TW": "zh-TW",
-	"GR": "el-GR",
-	"IL": "he-IL",
-	"HU": "hu-HU",
-	"ID": "id-ID",
-	"JP": "ja-JP",
-	"KR": "ko-KR",
-	"MY": "ms-MY",
-	"PT": "pt-PT",
-	"RU": "ru-RU",
-	"SK": "sk-SK",
-	"TH": "th-TH",
-	"TR": "tr-TR",
-	"UA": "uk-UA",
-	"VN": "vi-VN",
-	"SA": "ar-SA",
-	"MX": "es-MX",
-	"CL": "es-CL",
-	"CO": "es-CO",
-	"PE": "es-PE",
-	"VE": "es-VE",
-	"ZA": "en-ZA",
-	"IN": "en-IN",
-	"RS": "sr-RS",
-	"CZ": "cs-CZ",
-	"SV": "sv-SE",
-	"DA": "da-DK",
-	"ZH": "zh-CN",
-	"EL": "el-GR",
-	"HE": "he-IL",
-	"JA": "ja-JP",
-	"KO": "ko-KR",
-	"MS": "ms-MY",
-	"RO": "ro-RO",
-	"UK": "uk-UA",
-	"VI": "vi-VN",
-	"AR": "ar-SA",
-	"BG": "bg-BG",
-	"HR": "hr-HR",
-	"CS": "cs-CZ",
-}
-
-func GetLangCountryMapping() map[string]string {
-	return CountryToLocale
-}
-
 func ConvertCountryToLocale(countries []string) []string {
 	locales := make([]string, len(countries))
 
 	for i, country := range countries {
-		if locale, ok := CountryToLocale[country]; ok {
+		if locale, ok := constants.CountryToLocale[country]; ok {
 			locales[i] = locale
 		} else {
 			log.Fatal("Error: Country code not found: " + country)
@@ -110,7 +46,6 @@ func ConvertCountryToLocale(countries []string) []string {
 	return locales
 }
 
-// Contains checks if a string is present in a slice.
 func Contains(arr []string, str string) bool {
 	for _, a := range arr {
 		if a == str {
@@ -120,7 +55,6 @@ func Contains(arr []string, str string) bool {
 	return false
 }
 
-// CheckError prints an error message and exits if the error is not nil.
 func CheckError(msg string, err error) {
 	if err != nil {
 		fmt.Println(msg+":", err)
@@ -139,40 +73,6 @@ func RemoveDuplicates(s []string) []string {
 		}
 	}
 	return unique
-}
-
-func GetLanguagesFromLocFile(locFilePath string) ([]string, error) {
-	fileData, err := csv.ReadCSVFile(locFilePath)
-	if err != nil {
-		if !strings.HasSuffix(locFilePath, ".csv") {
-			csvFilePath := locFilePath + ".csv"
-			fileData, err = csv.ReadCSVFile(csvFilePath)
-		}
-		if err != nil {
-			if !strings.HasSuffix(locFilePath, ".txt") && !strings.HasSuffix(locFilePath, ".csv") {
-				txtFilePath := locFilePath + ".txt"
-				fileData, err = csv.ReadCSVFile(txtFilePath)
-			}
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	languages := make([]string, 0)
-
-	// Extract the language codes from the first column of fileData
-	for _, row := range fileData {
-		if len(row) < 1 {
-			continue
-		}
-		langCode := row[0]
-		if len(langCode) == 2 {
-			languages = append(languages, langCode)
-		}
-	}
-
-	return languages, nil
 }
 
 func ParseParams(params []string) map[string][]string {
@@ -200,4 +100,35 @@ func GenerateFileName(output string) string {
 	}
 
 	return filename
+}
+
+func GetLanguagesFromLocFile(locFilePath string) ([]string, error) {
+	fileData, err := csv.ReadCSVFile(locFilePath)
+	if err != nil {
+		fmt.Printf("Error while reading LOC FILE: %s", err)
+		return nil, err
+	}
+
+	languages := make([]string, 0)
+	for _, row := range fileData {
+		if len(row) < 1 {
+			continue
+		}
+		langCode := row[0]
+		if len(langCode) == 2 {
+			languages = append(languages, langCode)
+		}
+	}
+
+	return languages, nil
+}
+
+func GenerateEmail(lang, country string, paramValues []string) string {
+	normalizedLang := strings.ReplaceAll(lang, "-", "_")
+	params := strings.Join(paramValues, "_")
+	delimiter := ""
+	if params != "" {
+		delimiter = "_"
+	}
+	return fmt.Sprintf("example_%s%s%s@example.com", strings.ToLower(normalizedLang), delimiter, params)
 }

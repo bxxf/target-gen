@@ -27,8 +27,6 @@ func (c *DataClient) GetCountries(brand string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Add Authorization header
 	req.Header.Add("Authorization", c.token)
 
 	client := http.Client{}

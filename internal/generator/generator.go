@@ -5,11 +5,11 @@ import (
 	"log"
 	"sync"
 
-	"github.com/bxxf/tgen/internal/utils"
+	"github.com/bxxf/tgen/internal/constants"
 )
 
 func Generate(languages []string, flags map[string]string, parameters map[string][]string) ([][]string, error) {
-	langCountryMapping := utils.GetLangCountryMapping()
+	langCountryMapping := constants.CountryToLocale
 	enAll := flags["en-all"] == "true"
 	countries, isAvg, err := getBrandCountries(languages, flags, enAll)
 	if err != nil {

@@ -58,7 +58,6 @@ func init() {
 }
 
 func initAutoComplete() {
-	// Add autocomplete function for loc-file flag
 	rootCmd.RegisterFlagCompletionFunc("loc-file", autoCompleteLocFile)
 	rootCmd.RegisterFlagCompletionFunc("output", autoCompleteLocFile)
 	rootCmd.RegisterFlagCompletionFunc("config", autoCompleteLocFile)

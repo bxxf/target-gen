@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/bxxf/tgen/internal/config"
+	"github.com/bxxf/tgen/internal/constants"
 	"github.com/bxxf/tgen/internal/data"
 	"github.com/bxxf/tgen/internal/utils"
 )
@@ -14,7 +15,7 @@ func getBrandCountries(langs []string, flags map[string]string, includeEN bool) 
 		return nil, isCountryFormat, err
 	}
 	if includeEN {
-		countries = append(countries, EN_COUNTRIES...)
+		countries = append(countries, constants.EN_COUNTRIES...)
 	}
 	countries = utils.RemoveDuplicates(countries)
 	for i := range countries {
@@ -24,7 +25,7 @@ func getBrandCountries(langs []string, flags map[string]string, includeEN bool) 
 }
 
 func determineFormat(langs []string, flags map[string]string) (bool, []string, error) {
-	redisCli := data.NewDataClient(config.Config.URL, config.Config.Token)
+	dataClient := data.NewDataClient(config.Config.URL, config.Config.Token)
 	isCountryFormat := false
 	formatFlag := flags["format"]
 	if formatFlag != "" {
@@ -38,7 +39,7 @@ func determineFormat(langs []string, flags map[string]string) (bool, []string, e
 		if strings.ToLower(langs[0]) == "avg" {
 			isCountryFormat = true
 		}
-		countriesMapped, _ := redisCli.GetCountries(strings.ToLower(langs[0]))
+		countriesMapped, _ := dataClient.GetCountries(strings.ToLower(langs[0]))
 
 		countries = countriesMapped
 	} else {
@@ -61,7 +62,6 @@ func generateHeader(params map[string][]string, isCountryFormat bool) ([]string,
 	var relevantParamKeys []string
 	for _, key := range paramKeys {
 		value := params[key]
-		// Exclude parameters with empty values
 		if len(value) > 0 {
 			header = append(header, key)
 			relevantParamKeys = append(relevantParamKeys, key)
