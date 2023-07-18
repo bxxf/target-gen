@@ -11,18 +11,6 @@ import (
 	"github.com/bxxf/tgen/internal/csv"
 )
 
-func ParseArgs(args []string) map[string][]string {
-	parameters := make(map[string][]string, len(args))
-	for _, arg := range args {
-		parts := strings.SplitN(arg, "=", 2)
-		if len(parts) == 2 {
-			parameters[parts[0]] = strings.Split(parts[1], ",")
-		} else {
-			parameters[arg] = []string{}
-		}
-	}
-	return parameters
-}
 
 func GetParamKeys(parameters map[string][]string) []string {
 	keys := make([]string, 0, len(parameters))
@@ -32,35 +20,6 @@ func GetParamKeys(parameters map[string][]string) []string {
 	return keys
 }
 
-func ConvertCountryToLocale(countries []string) []string {
-	locales := make([]string, len(countries))
-
-	for i, country := range countries {
-		if locale, ok := constants.CountryToLocale[country]; ok {
-			locales[i] = locale
-		} else {
-			log.Fatal("Error: Country code not found: " + country)
-		}
-	}
-
-	return locales
-}
-
-func Contains(arr []string, str string) bool {
-	for _, a := range arr {
-		if a == str {
-			return true
-		}
-	}
-	return false
-}
-
-func CheckError(msg string, err error) {
-	if err != nil {
-		fmt.Println(msg+":", err)
-		os.Exit(1)
-	}
-}
 
 func RemoveDuplicates(s []string) []string {
 	unique := make([]string, 0, len(s))
@@ -121,14 +80,4 @@ func GetLanguagesFromLocFile(locFilePath string) ([]string, error) {
 	}
 
 	return languages, nil
-}
-
-func GenerateEmail(lang, country string, paramValues []string) string {
-	normalizedLang := strings.ReplaceAll(lang, "-", "_")
-	params := strings.Join(paramValues, "_")
-	delimiter := ""
-	if params != "" {
-		delimiter = "_"
-	}
-	return fmt.Sprintf("example_%s%s%s@example.com", strings.ToLower(normalizedLang), delimiter, params)
 }
