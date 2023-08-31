@@ -2,12 +2,9 @@ package utils
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"strings"
 	"time"
 
-	"github.com/bxxf/tgen/internal/constants"
 	"github.com/bxxf/tgen/internal/csv"
 )
 
