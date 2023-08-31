@@ -60,4 +60,12 @@ var CountryToLocale = map[string]string{
 	"BG": "bg-BG",
 	"HR": "hr-HR",
 	"CS": "cs-CZ",
+	"AT": "de-AT",
+	"SG": "en-SG",
+	"BE": "nl-BE",
+	"CH": "de-CH",
+	"HK": "zh-HK",
+	"IE": "en-IE",
+	"NZ": "en-NZ",
+	
 }
