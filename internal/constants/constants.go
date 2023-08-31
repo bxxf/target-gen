@@ -1,6 +1,6 @@
 package constants
 
-var EN_COUNTRIES = []string{"US", "CA", "AU", "GB", "NZ", "IE", "SG"}
+var EN_COUNTRIES = []string{"US", "CA", "AU", "GB", "NZ", "IE", "SG", "IN"}
 
 var CountryToLocale = map[string]string{
 	"US": "en-US",
