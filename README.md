@@ -1,6 +1,8 @@
 # tgen
 
-A command-line tool for generating CSV target records based on specified parameters and configurations.
+A command-line tool for generating CSV target records based on specified parameters and configurations. It can be use for instance for generating sample set of targeted customers for email-based marketing communications.
+
+![Optimize](https://github.com/bxxf/tgen/assets/43238984/d9e439f1-9711-4bad-a6f1-53258d9cc6dd)
 
 ## Installation
 
